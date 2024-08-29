@@ -21,34 +21,45 @@ jobs:
           node-version: 18
       - name: Install Dependencies
         run: npm install
-      - name: Download and Install Chromedriver
+
+      # --- Conditional Chromedriver Installation ---
+      - name: Download and Install Chromedriver (Ubuntu)
+        if: matrix.os == 'ubuntu-latest'
         run: |
-          # Install curl (if not already installed)
           sudo apt-get update
-          sudo apt-get install -y curl 
-
-          # Get the latest stable Chromedriver version
+          sudo apt-get install -y curl wget unzip
           LATEST_CHROMEDRIVER_VERSION=$(curl -sS https://chromedriver.storage.googleapis.com/LATEST_RELEASE)
-
-          # Replace {your-chrome-version} with your actual Chrome major version (e.g., 114)
-          CHROMEDRIVER_VERSION=${LATEST_CHROMEDRIVER_VERSION} 
-
-          # Download the correct Chromedriver for your OS (adjust for macOS/Windows)
+          CHROMEDRIVER_VERSION=${LATEST_CHROMEDRIVER_VERSION}
           wget https://chromedriver.storage.googleapis.com/${CHROMEDRIVER_VERSION}/chromedriver_linux64.zip -O chromedriver.zip
           unzip chromedriver.zip
           chmod +x chromedriver
-
-          # Add Chromedriver to PATH
           sudo mv chromedriver /usr/local/bin/
+
+      - name: Download and Install Chromedriver (macOS)
+        if: matrix.os == 'macos-latest'
+        run: |
+          brew install chromedriver # Install using Homebrew
+          # You might not need to manually set the path if Homebrew manages it
+
+      - name: Download and Install Chromedriver (Windows)
+        if: matrix.os == 'windows-latest'
+        run: |
+          # Add Windows-specific Chromedriver installation commands here
+          # You can use tools like Chocolatey or download manually 
+
+      # --- End of Conditional Installation --- 
+
       - name: Build
         run: npm run compile
-      - name: Run Tests
-        uses: coactions/setup-xvfb@v1
-        if: matrix.os != 'ubuntu-latest'
+
+      - name: Run Tests 
+        uses: coactions/setup-xvfb@v1 
+        if: matrix.os != 'ubuntu-latest' # Continue using XVFB for macOS/Windows
         with:
           run: npm test
           options: "-screen 0 1600x1200x24"
-      - name: Run Tests
+
+      - name: Run Tests (Ubuntu) 
         uses: coactions/setup-xvfb@v1
         if: matrix.os == 'ubuntu-latest'
         with:
