@@ -21,6 +21,10 @@ jobs:
           node-version: 18
       - name: Install Dependencies
         run: npm install
+      - name: Download and Cache Chromedriver
+        uses: browser-actions/cache@v2  
+        with:
+          browser: chrome
       - name: Build
         run: npm run compile
       - name: Run Tests
