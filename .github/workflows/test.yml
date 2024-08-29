@@ -14,23 +14,53 @@ jobs:
     runs-on: ${{ matrix.os }}
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Use Node.js
-        uses: actions/setup-node@v1
+        uses: actions/setup-node@v3
         with:
-          node-version: 16
+          node-version: 18
       - name: Install Dependencies
         run: npm install
+
+      # --- Conditional Chromedriver Installation ---
+      - name: Download and Install Chromedriver (Ubuntu)
+        if: matrix.os == 'ubuntu-latest'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y curl wget unzip
+          LATEST_CHROMEDRIVER_VERSION=$(curl -sS https://chromedriver.storage.googleapis.com/LATEST_RELEASE)
+          CHROMEDRIVER_VERSION=${LATEST_CHROMEDRIVER_VERSION}
+          wget https://chromedriver.storage.googleapis.com/${CHROMEDRIVER_VERSION}/chromedriver_linux64.zip -O chromedriver.zip
+          unzip chromedriver.zip
+          chmod +x chromedriver
+          sudo mv chromedriver /usr/local/bin/
+
+      - name: Download and Install Chromedriver (macOS)
+        if: matrix.os == 'macos-latest'
+        run: |
+          brew install chromedriver # Install using Homebrew
+          npm install chromedriver --save-dev
+          npm install --save-dev @wdio/local-runner
+      - name: Download and Install Chromedriver (Windows)
+        if: matrix.os == 'windows-latest'
+        run: |
+          choco install chromedriver
+          npm install chromedriver --save-dev
+          
+      # --- End of Conditional Installation --- 
+
       - name: Build
         run: npm run compile
-      - name: Run Tests
-        uses: GabrielBB/xvfb-action@v1
-        if: matrix.os != 'ubuntu-latest'
+
+      - name: Run Tests 
+        uses: coactions/setup-xvfb@v1 
+        if: matrix.os != 'ubuntu-latest' # Continue using XVFB for macOS/Windows
         with:
           run: npm test
           options: "-screen 0 1600x1200x24"
-      - name: Run Tests
-        uses: GabrielBB/xvfb-action@v1
+
+      - name: Run Tests (Ubuntu) 
+        uses: coactions/setup-xvfb@v1
         if: matrix.os == 'ubuntu-latest'
         with:
           run: ./node_modules/.bin/run-s test:lint test:unit 
