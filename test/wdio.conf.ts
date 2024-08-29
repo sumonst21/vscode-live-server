@@ -80,7 +80,7 @@ export const config: Options.Testrunner = {
     // https://saucelabs.com/platform/platform-configurator
     //
     capabilities: [{
-        //browserName: 'vscode',
+        // browserName: 'vscode',
         'wdio:vscodeOptions': {
             extensionPath: path.join(__dirname, '..'),
             workspacePath: path.join(__dirname, '..'),
