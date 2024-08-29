@@ -14,7 +14,7 @@ jobs:
     runs-on: ${{ matrix.os }}
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v2
       - name: Use Node.js
         uses: actions/setup-node@v3
         with:
@@ -24,13 +24,13 @@ jobs:
       - name: Build
         run: npm run compile
       - name: Run Tests
-        uses: GabrielBB/xvfb-action@v1
+        uses: coactions/setup-xvfb@v1
         if: matrix.os != 'ubuntu-latest'
         with:
           run: npm test
           options: "-screen 0 1600x1200x24"
       - name: Run Tests
-        uses: GabrielBB/xvfb-action@v1
+        uses: coactions/setup-xvfb@v1
         if: matrix.os == 'ubuntu-latest'
         with:
           run: ./node_modules/.bin/run-s test:lint test:unit 
