@@ -1,5 +1,5 @@
 {
-  "rulesDirectory": [],
+  "rulesDirectory": [ ],
   "rules": {
     "arrow-return-shorthand": true,
     "callable-types": true,
@@ -30,7 +30,7 @@
     "member-ordering": [
       true,
       {
-        "name": "static field",
+        "name": "static-field",
         "kinds": [
           "public-static-field",
           "protected-static-field",
@@ -38,7 +38,7 @@
         ]
       },
       {
-        "name": "instance field",
+        "name": "instance-field",
         "kinds": [
           "public-instance-field",
           "protected-instance-field",
@@ -46,7 +46,7 @@
         ]
       },
       {
-        "name": "static method",
+        "name": "static-method",
         "kinds": [
           "public-static-method",
           "private-static-method",
@@ -57,11 +57,9 @@
         ]
       },
       {
-        "name": "instance method",
+        "name": "instance-method",
         "kinds": [
-          "public-constructor",
-          "protected-constructor",
-          "private-constructor",
+          "constructor",
           "public-instance-method",
           "protected-instance-method",
           "private-instance-method",
