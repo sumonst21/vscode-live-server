@@ -21,10 +21,25 @@ jobs:
           node-version: 18
       - name: Install Dependencies
         run: npm install
-      - name: Download and Cache Chromedriver
-        uses: browser-actions/cache@v2  
-        with:
-          browser: chrome
+      - name: Download and Install Chromedriver
+        run: |
+          # Install curl (if not already installed)
+          sudo apt-get update
+          sudo apt-get install -y curl 
+
+          # Get the latest stable Chromedriver version
+          LATEST_CHROMEDRIVER_VERSION=$(curl -sS https://chromedriver.storage.googleapis.com/LATEST_RELEASE)
+
+          # Replace {your-chrome-version} with your actual Chrome major version (e.g., 114)
+          CHROMEDRIVER_VERSION=${LATEST_CHROMEDRIVER_VERSION} 
+
+          # Download the correct Chromedriver for your OS (adjust for macOS/Windows)
+          wget https://chromedriver.storage.googleapis.com/${CHROMEDRIVER_VERSION}/chromedriver_linux64.zip -O chromedriver.zip
+          unzip chromedriver.zip
+          chmod +x chromedriver
+
+          # Add Chromedriver to PATH
+          sudo mv chromedriver /usr/local/bin/
       - name: Build
         run: npm run compile
       - name: Run Tests
